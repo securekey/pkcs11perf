@@ -1,0 +1,6 @@
+pkcs11perf
+
+# Intellij file
+.DS_Store
+
+.idea/
