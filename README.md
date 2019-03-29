@@ -43,7 +43,8 @@ $./pkcs11perf verify --msg "hello world" --storePath "/tmp/msp" --hashAlgorithm 
 ```
 
 ##### binary arguments:
- Available arguments are:
+```
+Available arguments are:
 	--hashAlgorithm or -g           Security Algorithm      Default: "SHA2"
 	--level or -l                   Security Level          Default: 256
 	--library or -r                 HSM Library Path(s)     Default: full path in the above command is the default value
@@ -59,3 +60,5 @@ $./pkcs11perf verify --msg "hello world" --storePath "/tmp/msp" --hashAlgorithm 
 	--burstVerify or -e             # of Burst calls of Verify function             Default: 5
 	--signDelay or -t               Delay between each PKCS11 Sign function         Default: 0s
 	--verifyDelay or -y             Delay between each PKCS11 Verify function       Default: 0s
+```
+
