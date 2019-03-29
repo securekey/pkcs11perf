@@ -9,10 +9,28 @@ $ make all
 $ make test
 ```
 
+###### build failure and how to fix it
+since the time/rate package is not playing nice with go mod, you might have to install this package manually.
 
-you may need to to grand access to the scripts used in the makefile, to do so run the following:
+make all output:
+cmd/verify.go:20:2: cannot find package "golang.org/x/time/rate" in any of:
+	/usr/local/Cellar/go/1.12/libexec/src/golang.org/x/time/rate (from $GOROOT)
+	/YOUR/GOPATH/src/golang.org/x/time/rate (from $GOPATH)
+chmod: pkcs11perf: No such file or directory
+make: *** [all] Error 1
+
+to fix this locally simply run:
+```
+$ GO111MODULE=on go get golang.org/x/time/rate
+$ make all
+```
+
+you may need to to grant access to the scripts used in the makefile the binary, to do so run the following:
 chmod 755 scripts/build.sh 
 chmod 755 scripts/test.sh
+
+after make all and before make test, grant access to the generated binary:
+chmod 755 pkcs11perf
 
 
 ##### To run the binary with different values you can run the binary directly
@@ -23,14 +41,19 @@ $./pkcs11perf verify --msg "hello world" --storePath "/tmp/msp" --hashAlgorithm 
 ```
 
 ##### binary arguments:
-	--hashAlgorithm or -g   Default: "SHA2"
-	--level or -l           Default: 256
-	--library or -r         Default: full path in the above command is the default value
-	--storePath or -s       Default: "". It can be any locally available path.
-	--storeLabel or -b      Default: "ForFabric"
-	--pin or -p             Default: "98765432"
-	--softVerify or -v      Default: false
-	--msg or -m             Default: "Hello World"
-	--iterations or -i      Default: 100
-	--throttle or -t        Default: 0s, ie no throttling
-	--throttleVerify or -y  Default: 0s, ie no throttling
+ Available arguments are:
+	--hashAlgorithm or -g           Security Algorithm      Default: "SHA2"
+	--level or -l                   Security Level          Default: 256
+	--library or -r                 HSM Library Path(s)     Default: full path in the above command is the default value
+	--storePath or -s               Store Path              Default: "". It can be any locally available path.
+	--storeLabel or -b              Store Label             Default: "ForFabric"
+	--pin or -p                     Store Pin               Default: "98765432"
+	--softVerify or -v              Soft Verify             Default: false
+	--msg or -m                     Message to Sign by BCCSP using a generated key  Default: "Hello World"
+	--iterations or -i              Number of times to run the PKCS11 Sign function Default: 100
+	--throttleSign or -t            Throttle between each PKCS11 Sign function      Default: 0s, ie no throttling
+	--throttleVerify or -y          Throttle between each PKCS11 Verify function    Default: 0s, ie no throttling
+	--concurrencyLimitSign or -c    Concurrency Limit of Sign function              Default: 250
+	--burstSign or -b               # of Burst calls of Sign function               Default: 10
+	--concurrencyLimitVerify or -f  Concurrency Limit of Verify function            Default: 250
+	--burstVerify or -e             # of Burst calls of Verify function             Default: 10
