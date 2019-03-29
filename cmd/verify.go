@@ -34,12 +34,12 @@ var (
 	softVerify             bool   // false
 	msg                    string
 	iterations             int           // 1000 times
-	throttleSign           time.Duration // 2 sec
 	concurrencyLimitSign   int           // 250
 	burstSign              int           // 10
-	throttleVerify         time.Duration // 2 sec
 	concurrencyLimitVerify int           // 250
 	burstVerify            int           // 10
+	signDelay              time.Duration // 0s
+	verifyDelay            time.Duration // 0s
 )
 
 // verifyCmd represents the verify command
@@ -80,6 +80,7 @@ var verifyCmd = &cobra.Command{
 		n = time.Now()
 		bytesArr := make([][]byte, iterations)
 		for i := 0; i < iterations; i++ {
+			time.Sleep(signDelay) //configurable delay in between iterations
 			go func(threadNum int) {
 				fmt.Println("		Signing msg # ", threadNum, " (in a separate thread)")
 				// this sends an empty struct into the signChan which
@@ -132,6 +133,7 @@ var verifyCmd = &cobra.Command{
 		limiter = rate.NewLimiter(rate.Limit(concurrencyLimitVerify), burstVerify)
 		n = time.Now()
 		for i := 0; i < iterations; i++ {
+			time.Sleep(verifyDelay) //configurable delay in between iterations
 			go func(threadNum int) {
 				fmt.Println("		Verifying signature of msg # ", threadNum, " (in a separate thread)")
 				verifyChan <- struct{}{}
@@ -180,12 +182,12 @@ func init() {
 	verifyCmd.PersistentFlags().BoolVarP(&softVerify, "softVerify", "v", true, "Soft Verify (Default: true)")
 	verifyCmd.PersistentFlags().StringVarP(&msg, "msg", "m", "Hello World", "Message to Sign by BCCSP using a generated key (Default: \"Hello World\")")
 	verifyCmd.PersistentFlags().IntVarP(&iterations, "iterations", "i", 1000, "Number of times to run the PKCS11 Sign function (Default: 1000)")
-	verifyCmd.PersistentFlags().DurationVarP(&throttleSign, "throttleSign", "t", 0*time.Second, "Throttle between each PKCS11 Sign function (Default: 0s, ie no throttling)")
-	verifyCmd.PersistentFlags().DurationVarP(&throttleVerify, "throttleVerify", "y", 0*time.Second, "Throttle between each PKCS11 Verify function (Default: 0s, ie no throttling)")
-	verifyCmd.PersistentFlags().IntVarP(&concurrencyLimitSign, "concurrencyLimitSign", "c", 250, "Concurrency Limit of Sign function (Default: 250)")
-	verifyCmd.PersistentFlags().IntVarP(&burstSign, "burstSign", "b", 10, "# of Burst calls of Sign function (Default: 10)")
-	verifyCmd.PersistentFlags().IntVarP(&concurrencyLimitVerify, "concurrencyLimitVerify", "f", 250, "Concurrency Limit of Verify function (Default: 250)")
-	verifyCmd.PersistentFlags().IntVarP(&burstVerify, "burstVerify", "e", 10, "# of Burst calls of Verify function (Default: 10)")
+	verifyCmd.PersistentFlags().IntVarP(&concurrencyLimitSign, "concurrencyLimitSign", "c", 50, "Concurrency Limit of Sign function (Default: 50)")
+	verifyCmd.PersistentFlags().IntVarP(&burstSign, "burstSign", "b", 5, "# of Burst calls of Sign function (Default: 5)")
+	verifyCmd.PersistentFlags().IntVarP(&concurrencyLimitVerify, "concurrencyLimitVerify", "f", 50, "Concurrency Limit of Verify function (Default: 50)")
+	verifyCmd.PersistentFlags().IntVarP(&burstVerify, "burstVerify", "e", 5, "# of Burst calls of Verify function (Default: 5)")
+	verifyCmd.PersistentFlags().DurationVarP(&signDelay, "signDelay", "t", 0*time.Second, "Delay between each PKCS11 Sign function (Default: 0s)")
+	verifyCmd.PersistentFlags().DurationVarP(&verifyDelay, "verifyDelay", "y", 0*time.Second, "Delay between each PKCS11 Verify function (Default: 0s)")
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// verifyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

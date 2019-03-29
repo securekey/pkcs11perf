@@ -6,7 +6,7 @@
 #
 
 
-go build -tags pkcs11 -o pkcs11perf
+GO111MODULE=on go build -tags pkcs11 -o pkcs11perf
 chmod 755 pkcs11perf
 
 

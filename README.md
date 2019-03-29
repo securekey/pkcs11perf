@@ -9,6 +9,7 @@ $ make all
 $ make test
 ```
 
+<<<<<<< HEAD
 ###### build failure and how to fix it
 since the time/rate package is not playing nice with go mod, you might have to install this package manually.
 
@@ -25,7 +26,8 @@ $ GO111MODULE=on go get golang.org/x/time/rate
 $ make all
 ```
 
-you may need to to grant access to the scripts used in the makefile the binary, to do so run the following:
+
+You may need to to grant access to the scripts used in the makefile the binary, to do so run the following:
 chmod 755 scripts/build.sh 
 chmod 755 scripts/test.sh
 
@@ -37,7 +39,7 @@ chmod 755 pkcs11perf
 ```
 $./pkcs11perf verify --msg "hello world" --storePath "/tmp/msp" --hashAlgorithm "SHA2" --level 256 \
 --library "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so,/usr/lib/softhsm/libsofthsm2.so,/usr/lib/s390x-linux-gnu/softhsm/libsofthsm2.so,/usr/lib/powerpc64le-linux-gnu/softhsm/libsofthsm2.so, /usr/local/Cellar/softhsm/2.5.0/lib/softhsm/libsofthsm2.so" \
---storeLabel "ForFabric" --pin "123456789" --softVerify true --iterations 1000 --throttle 1s --throttleVerify 1s
+--storeLabel "ForFabric" --pin "123456789" --softVerify true --iterations 1000 --concurrencyLimitSign 50 --burstSign 5 --concurrencyLimitVerify 50 --burstVerify 5 --signDelay 1s --verifyDelay 1s
 ```
 
 ##### binary arguments:
@@ -51,9 +53,9 @@ $./pkcs11perf verify --msg "hello world" --storePath "/tmp/msp" --hashAlgorithm 
 	--softVerify or -v              Soft Verify             Default: false
 	--msg or -m                     Message to Sign by BCCSP using a generated key  Default: "Hello World"
 	--iterations or -i              Number of times to run the PKCS11 Sign function Default: 100
-	--throttleSign or -t            Throttle between each PKCS11 Sign function      Default: 0s, ie no throttling
-	--throttleVerify or -y          Throttle between each PKCS11 Verify function    Default: 0s, ie no throttling
-	--concurrencyLimitSign or -c    Concurrency Limit of Sign function              Default: 250
-	--burstSign or -b               # of Burst calls of Sign function               Default: 10
-	--concurrencyLimitVerify or -f  Concurrency Limit of Verify function            Default: 250
-	--burstVerify or -e             # of Burst calls of Verify function             Default: 10
+	--concurrencyLimitSign or -c    Concurrency Limit of Sign function              Default: 50
+	--burstSign or -b               # of Burst calls of Sign function               Default: 5
+	--concurrencyLimitVerify or -f  Concurrency Limit of Verify function            Default: 50
+	--burstVerify or -e             # of Burst calls of Verify function             Default: 5
+	--signDelay or -t               Delay between each PKCS11 Sign function         Default: 0s
+	--verifyDelay or -y             Delay between each PKCS11 Verify function       Default: 0s
